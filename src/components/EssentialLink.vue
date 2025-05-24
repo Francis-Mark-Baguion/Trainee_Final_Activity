@@ -1,10 +1,5 @@
 <template>
-  <q-item
-    clickable
-    tag="a"
-    target="_blank"
-    :href="props.link"
-  >
+    <q-item clickable :to="route_name">
     <q-item-section
       v-if="props.icon"
       avatar

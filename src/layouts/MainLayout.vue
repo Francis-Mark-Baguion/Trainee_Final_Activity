@@ -91,7 +91,26 @@ const linksList = [
     caption: 'Community Quasar projects',
     icon: 'favorite',
     link: 'https://awesome.quasar.dev'
-  }
+  },
+  {
+    title: "My Tasks",
+    caption: "List of unfinished tasks",
+    icon: "task",
+    route_name: "my-tasks",
+  },
+  {
+    title: "Finished Tasks",
+    caption: "List of finished tasks",
+    icon: "check_circle_outline",
+    route_name: "finished-tasks",
+  },
+  {
+    title: "Deleted Tasks",
+    caption: "List of deleted tasks",
+    icon: "delete_outline",
+    route_name: "deleted-tasks",
+  },
+
 ]
 
 const leftDrawerOpen = ref(false)
