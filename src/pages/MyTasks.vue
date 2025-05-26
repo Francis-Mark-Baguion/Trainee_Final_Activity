@@ -27,7 +27,7 @@ onMounted(fetchTasks)
 const addTodo = async () => {
   if (!text.value.trim()) return
   try {
-    // For demo purposes, we'll just create a local task
+    
     const newTask = { id: Date.now(), todo: text.value.trim() }
     MyTasks.value.unshift(newTask)
     text.value = ''
@@ -45,14 +45,14 @@ const selectTodo = (task) => {
 
 const updateTodo = async () => {
   if (!text.value.trim()) {
-    // Don't allow empty updates - you could also delete the task here if you prefer
+    
     return
   }
   
   try {
     const index = MyTasks.value.findIndex((t) => t.id === selectedTodo.value.id)
     if (index !== -1) {
-      // Update the local task directly (since JSONPlaceholder won't actually update)
+    
       MyTasks.value[index].todo = text.value.trim()
       saveTasks()
     }
