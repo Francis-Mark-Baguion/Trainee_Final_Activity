@@ -1,3 +1,4 @@
+// src/boot/axios.js
 import { boot } from 'quasar/wrappers';
 import axios from 'axios';
 
@@ -8,4 +9,4 @@ export default boot(({ app }) => {
   app.config.globalProperties.$api = api;
 });
 
-export { axios, api };
+export { api };
