@@ -1,9 +1,6 @@
 <template>
-    <q-item clickable :to="route_name">
-    <q-item-section
-      v-if="props.icon"
-      avatar
-    >
+  <q-item clickable :to="route_name">
+    <q-item-section v-if="props.icon" avatar>
       <q-icon :name="props.icon" />
     </q-item-section>
 
@@ -18,22 +15,26 @@
 const props = defineProps({
   title: {
     type: String,
-    required: true
+    required: true,
   },
 
   caption: {
     type: String,
-    default: ''
+    default: '',
   },
 
   link: {
     type: String,
-    default: '#'
+    default: '#',
+  },
+  route_name: {
+    type: String,
+    default: '#',
   },
 
   icon: {
     type: String,
-    default: ''
-  }
+    default: '',
+  },
 })
 </script>

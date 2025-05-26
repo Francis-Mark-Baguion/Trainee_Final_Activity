@@ -1,6 +1,7 @@
-<script setup></script>
-
+<script setup>
+import DeletedTaskComponent from 'src/components/DeletedTask.vue'
+</script>
 
 <template>
-  <div></div>
+  <DeletedTaskComponent />
 </template>

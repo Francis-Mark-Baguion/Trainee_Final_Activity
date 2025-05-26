@@ -1,6 +1,7 @@
-<script setup></script>
-
+<script setup>
+import FinishedTaskComponent from '../components/FinishedTask.vue'
+</script>
 
 <template>
-  <div></div>
+  <FinishedTaskComponent />
 </template>
