@@ -40,7 +40,8 @@ const selectTodo = (task) => {
 }
 
 const updateTodo = async () => {
-  // Remove validation requirement for empty input during update
+  //Previously causing an error where when updating a task and setting the text to empty it would not update anymore and get stuck in the update state.
+  //bug-002: WHen you click submit wihtout anything on the text field it would again cause it to be stuck at that state.
   try {
     const updatedTask = { title: text.value, completed: false }
     await axios.put(`https://jsonplaceholder.typicode.com/todos/${selectedTodo.value.id}`, updatedTask)
@@ -49,7 +50,7 @@ const updateTodo = async () => {
       if (text.value.trim()) {
         MyTasks.value[index].todo = text.value
       } else {
-        // If field is empty, treat it as deletion
+        
         const deletedTask = MyTasks.value.splice(index, 1)[0]
         DeletedTasks.value.push(deletedTask)
       }
@@ -95,6 +96,7 @@ const removeTodo = async () => {
 </script>
 
 <template>
+  <!-- Change the background here and not at the style section -->
   <q-page class="q-pa-md" :style="{ background: '#e8f0fe', minHeight: '100vh' }">
     <q-form ref="form" @submit.prevent="!selectedTodo ? addTodo() : updateTodo()" class="q-mb-md row items-center q-gutter-sm">
       <q-input
