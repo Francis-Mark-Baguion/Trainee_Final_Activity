@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { MyTasks, FinishedTasks, DeletedTasks } from '../composables/Tasks'
+import { MyTasks, FinishedTasks, DeletedTasks, saveTasks } from '../composables/Tasks'
 import axios from 'axios'
 
 let text = ref('')
@@ -11,11 +11,14 @@ let toMarkAsDone = ref(null)
 let toDelete = ref(null)
 
 const fetchTasks = async () => {
-  try {
-    const response = await axios.get('https://jsonplaceholder.typicode.com/todos?_start=10&_limit=10')
-    MyTasks.value = response.data.map((todo) => ({ id: todo.id, todo: todo.title }))
-  } catch (error) {
-    console.error('Error fetching tasks:', error)
+  if (MyTasks.value.length === 0) {
+    try {
+      const response = await axios.get('https://jsonplaceholder.typicode.com/todos?_start=10&_limit=10')
+      MyTasks.value = response.data.map((todo) => ({ id: todo.id, todo: todo.title }))
+      saveTasks()
+    } catch (error) {
+      console.error('Error fetching tasks:', error)
+    }
   }
 }
 
@@ -24,11 +27,12 @@ onMounted(fetchTasks)
 const addTodo = async () => {
   if (!text.value.trim()) return
   try {
-    const newTask = { title: text.value, completed: false }
-    const response = await axios.post('https://jsonplaceholder.typicode.com/todos', newTask)
-    MyTasks.value.unshift({ id: Date.now(), todo: response.data.title })
+    // For demo purposes, we'll just create a local task
+    const newTask = { id: Date.now(), todo: text.value.trim() }
+    MyTasks.value.unshift(newTask)
     text.value = ''
     form.value.reset()
+    saveTasks()
   } catch (error) {
     console.error('Error adding task:', error)
   }
@@ -40,20 +44,17 @@ const selectTodo = (task) => {
 }
 
 const updateTodo = async () => {
-  //Previously causing an error where when updating a task and setting the text to empty it would not update anymore and get stuck in the update state.
-  //bug-002: WHen you click submit wihtout anything on the text field it would again cause it to be stuck at that state.
+  if (!text.value.trim()) {
+    // Don't allow empty updates - you could also delete the task here if you prefer
+    return
+  }
+  
   try {
-    const updatedTask = { title: text.value, completed: false }
-    await axios.put(`https://jsonplaceholder.typicode.com/todos/${selectedTodo.value.id}`, updatedTask)
     const index = MyTasks.value.findIndex((t) => t.id === selectedTodo.value.id)
     if (index !== -1) {
-      if (text.value.trim()) {
-        MyTasks.value[index].todo = text.value
-      } else {
-        
-        const deletedTask = MyTasks.value.splice(index, 1)[0]
-        DeletedTasks.value.push(deletedTask)
-      }
+      // Update the local task directly (since JSONPlaceholder won't actually update)
+      MyTasks.value[index].todo = text.value.trim()
+      saveTasks()
     }
     text.value = ''
     selectedTodo.value = null
@@ -74,6 +75,7 @@ const markAsDone = () => {
   if (index !== -1) {
     FinishedTasks.value.push(MyTasks.value[index])
     MyTasks.value.splice(index, 1)
+    saveTasks()
   }
   toMarkAsDone.value = null
   showDialog.value = false
@@ -81,11 +83,11 @@ const markAsDone = () => {
 
 const removeTodo = async () => {
   try {
-    await axios.delete(`https://jsonplaceholder.typicode.com/todos/${toDelete.value.id}`)
     const index = MyTasks.value.findIndex((t) => t.id === toDelete.value.id)
     if (index !== -1) {
       const deletedTask = MyTasks.value.splice(index, 1)[0]
       DeletedTasks.value.push(deletedTask)
+      saveTasks()
     }
     toDelete.value = null
     showDialog.value = false
@@ -96,7 +98,6 @@ const removeTodo = async () => {
 </script>
 
 <template>
-  <!-- Change the background here and not at the style section -->
   <q-page class="q-pa-md" :style="{ background: '#e8f0fe', minHeight: '100vh' }">
     <q-form ref="form" @submit.prevent="!selectedTodo ? addTodo() : updateTodo()" class="q-mb-md row items-center q-gutter-sm">
       <q-input
@@ -104,12 +105,18 @@ const removeTodo = async () => {
         label="Task Name"
         filled
         class="col-grow"
-        :rules="[(val) => !!val || 'Field is required']"
+        :rules="[(val) => !!val.trim() || 'Field is required']"
       />
       <q-btn
         :label="!selectedTodo ? 'Add Task' : 'Update Task'"
         type="submit"
         color="primary"
+      />
+      <q-btn
+        v-if="selectedTodo"
+        label="Cancel"
+        color="negative"
+        @click="selectedTodo = null; text = ''; form.reset()"
       />
     </q-form>
 
