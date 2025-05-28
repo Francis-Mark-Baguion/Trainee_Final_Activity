@@ -1,20 +1,24 @@
-import { ref } from "vue";
+import { ref } from 'vue'
+import { LocalStorage } from 'quasar'
 
-// Load tasks from localStorage or initialize empty arrays
 const loadTasks = (key) => {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : [];
-};
+  const data = LocalStorage.getItem(key)
+  return (Array.isArray(data) ? data : []).filter(task => 
+    task && typeof task === 'object' && task.id && task.todo
+  )
+}
+let MyTasks = ref(loadTasks('myTasks'))
+let FinishedTasks = ref(loadTasks('finishedTasks'))
+let DeletedTasks = ref(loadTasks('deletedTasks'))
 
-let MyTasks = ref(loadTasks('myTasks'));
-let FinishedTasks = ref(loadTasks('finishedTasks'));
-let DeletedTasks = ref(loadTasks('deletedTasks'));
-
-// Function to save tasks to localStorage
 const saveTasks = () => {
-  localStorage.setItem('myTasks', JSON.stringify(MyTasks.value));
-  localStorage.setItem('finishedTasks', JSON.stringify(FinishedTasks.value));
-  localStorage.setItem('deletedTasks', JSON.stringify(DeletedTasks.value));
-};
+  const validTasks = (tasks) => tasks.filter(task => 
+    task && typeof task === 'object' && task.id && task.todo
+  )
+  
+  LocalStorage.set('myTasks', validTasks(MyTasks.value))
+  LocalStorage.set('finishedTasks', validTasks(FinishedTasks.value))
+  LocalStorage.set('deletedTasks', validTasks(DeletedTasks.value))
+}
 
-export { MyTasks, FinishedTasks, DeletedTasks, saveTasks };
+export { MyTasks, FinishedTasks, DeletedTasks, saveTasks }
